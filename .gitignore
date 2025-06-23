@@ -1,0 +1,59 @@
+# Ignore build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# ASP.NET / Entity Framework
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Rider / JetBrains IDEs
+.idea/
+
+# Logs
+*.log
+
+# Dotnet tools
+*.pdb
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+# Uncomment if using package restore
+# !packages/repositories.config
+
+# EF Core Migrations snapshots
+*Migrations/*.Designer.cs
+*Migrations/*ModelSnapshot.cs
+
+# Publish outputs
+publish/
+wwwroot/dist/
+wwwroot/node_modules/
+
+# Node modules (if using frontend stuff)
+node_modules/
+
+# Environment & secrets
+.env
+appsettings.*.json
+secrets.json
+
+# Backup & temp files
+*.bak
+*.tmp
+*.swp
