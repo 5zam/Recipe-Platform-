@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using RecipePlatform.DAL.Context;
+
 namespace RecipePlatform.MVC
 {
     public class Program
@@ -8,6 +11,10 @@ namespace RecipePlatform.MVC
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            //dependency injection
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
 
             var app = builder.Build();
 
