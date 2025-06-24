@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RecipePlatform.BLL.Interfaces;
+using RecipePlatform.BLL.Repositories;
 using RecipePlatform.DAL.Context;
 using RecipePlatform.Models.UserModels;
 
@@ -20,6 +22,10 @@ namespace RecipePlatform.MVC
             //dependency injection
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IRecipeService, RecipeService>();
+
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

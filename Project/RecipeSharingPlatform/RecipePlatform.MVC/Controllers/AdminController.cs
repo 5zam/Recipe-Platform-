@@ -90,28 +90,21 @@ namespace RecipePlatform.MVC.Controllers
 
         //add category 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCategory(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return RedirectToAction("Dashboard");
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                _context.Categories.Add(new Category { Name = name.Trim() });
+                await _context.SaveChangesAsync();
+            }
 
-            _context.Categories.Add(new Category { Name = name });
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Dashboard");
+           
+            return RedirectToAction(nameof(Dashboard));
         }
-        //[HttpPost, ValidateAntiForgeryToken]
-        //public async Task<IActionResult> AddCategory(string name)
-        //{
-        //    if (!string.IsNullOrWhiteSpace(name))
-        //    {
-        //        _context.Categories.Add(new Category { Name = name.Trim() });
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    return RedirectToAction(nameof(Index));
-        //}
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var cat = await _context.Categories.FindAsync(id);
@@ -120,8 +113,11 @@ namespace RecipePlatform.MVC.Controllers
                 _context.Categories.Remove(cat);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(Index));
+
+            
+            return RedirectToAction(nameof(Dashboard));
         }
+
 
 
     }

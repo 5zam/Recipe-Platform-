@@ -143,35 +143,61 @@
 
     <!--  Categories Panel -->
     <div class="tab-pane fade" id="categoriesPanel" role="tabpanel">
-        <form method="post" class="d-flex mb-3" asp-action="AddCategory" asp-controller="Admin">
-            <input type="text" name="name" class="form-control me-2" placeholder="New category..." required />
-            <button type="submit" class="btn btn-primary">Add</button>
-        </form>
+        <div class="container">
 
-        <table class="table table-bordered text-center align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Name</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var cat in Model.Categories)
-                {
+            <form method="post" class="d-flex mb-3" asp-action="AddCategory" asp-controller="Admin">
+                <input type="text" name="name" class="form-control me-2" placeholder="New category..." required />
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
                     <tr>
-                        <td>@cat.Name</td>
-                        <td>
-                            <form method="post" asp-action="DeleteCategory" asp-controller="Admin">
-                                <input type="hidden" name="id" value="@cat.Id" />
-                                <button class="btn btn-outline-danger btn-sm" type="submit">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <th>Name</th>
+                        <th>Delete</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <tr>
+                            <td>@cat.Name</td>
+                            <td>
+                                <form method="post" asp-action="DeleteCategory" asp-controller="Admin">
+                                    <input type="hidden" name="id" value="@cat.Id" />
+                                    <button class="btn btn-outline-danger btn-sm" type="submit">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
     </div>
 
 </div>
+
+<script>
+    // عند تغيير التبويبة، نخزن اسمها في localStorage
+    document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (event) {
+            localStorage.setItem('activeTab', event.target.getAttribute('data-bs-target'));
+        });
+    });
+
+    // عند تحميل الصفحة، نقرأ التبويبة المخزنة ونعيد تفعيلها
+    // وبكذا حليت مشكله لما اضيف او احذف تتغير الصفحة للبداية
+    window.addEventListener('DOMContentLoaded', function () {
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            var triggerEl = document.querySelector(`button[data-bs-target="${activeTab}"]`);
+            if (triggerEl) {
+                new bootstrap.Tab(triggerEl).show();
+            }
+        }
+    });
+</script>
+
