@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using RecipePlatform.Models.ApplicationModels;
 using RecipePlatform.Models.UserModels;
 
 namespace RecipePlatform.DAL.Context
@@ -25,6 +26,9 @@ namespace RecipePlatform.DAL.Context
             builder.ApplyConfigurationsFromAssembly(Assembly.GetEntryAssembly());
         }
 
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<Rating> Rates { get; set; }
 
     }
 }

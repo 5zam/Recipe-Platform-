@@ -1,8 +1,51 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<section class="hero text-center text-white py-5" style="background:linear-gradient(135deg,#ff7e00,#ff4800)">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Discover Amazing Recipes</h1>
+        <p class="lead mb-4">
+            Share your culinary creations and explore thousands of delicious recipes
+            from home cooks around the world
+        </p>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        <form class="d-flex justify-content-center" asp-controller="Recipes" asp-action="Search" method="get">
+            <div class="input-group w-75 w-lg-50">
+                <input class="form-control form-control-lg" type="text" name="q"
+                       placeholder="Search for recipes, ingredients, cuisines…" />
+                <button class="btn btn-lg btn-outline-light px-4" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <h3 class="mb-4">
+            <i class="bi bi-clock-history text-warning"></i> Latest Recipes
+        </h3>
+
+        <div class="row g-4">
+            @* لاحقاً: loop على Model *@
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="~/img/cookie.jpg" class="card-img-top" alt="..." />
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">Classic Chocolate Chip Cookies</h5>
+                        <p class="card-text small text-muted">Soft, chewy cookies perfect for any occasion.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 d-flex justify-content-between small">
+                        <span><i class="bi bi-clock"></i> 27m</span>
+                        <span><i class="bi bi-star-fill text-warning"></i> 4.8</span>
+                    </div>
+                </div>
+            </div>
+            <!-- كرّر الكارت -->
+        </div>
+    </div>
+</section>
+<section class="py-5 text-center text-white"
+         style="background:linear-gradient(135deg,#00c97b,#00a87b)">
+    <div class="container">
+        <h3 class="mb-3 fw-bold">Ready to Share Your Recipe?</h3>
+        <p class="lead mb-4">Join our community of passionate cooks and share your favorite recipes with the world</p>
+        <a class="btn btn-light btn-lg px-4" asp-controller="Account" asp-action="Register">Get Started Today</a>
+    </div>
+</section>

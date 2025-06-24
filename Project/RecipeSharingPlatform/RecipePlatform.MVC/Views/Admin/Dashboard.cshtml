@@ -1,0 +1,177 @@
+﻿@using RecipePlatform.MVC.Models.ViewModels
+
+@model RecipePlatform.MVC.Models.ViewModels.AdminDashboardVM
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2 class="text-center my-4">Admin Dashboard</h2>
+
+<!--  Dashboard Stats -->
+<div class="row justify-content-center mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <h2>@Model.TotalUsers</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-danger">Suspended</h5>
+                <h2 class="text-danger">@Model.SuspendedUsers</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title">Recipes</h5>
+                <h2>@Model.TotalRecipes</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--  Nav Tabs -->
+<ul class="nav nav-pills justify-content-center mb-4" id="adminTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#usersPanel" type="button" role="tab">Users</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="recipes-tab" data-bs-toggle="tab" data-bs-target="#recipesPanel" type="button" role="tab">Recipes</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categoriesPanel" type="button" role="tab">Categories</button>
+    </li>
+</ul>
+
+<!--  Tab Contents -->
+<div class="tab-content">
+
+    <!--  Users Panel -->
+    <div class="tab-pane fade show active" id="usersPanel" role="tabpanel">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Recipes</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model.Users)
+                {
+                    <tr>
+                        <td>@u.UserName</td>
+                        <td>@u.Email</td>
+                        <td>@(u.Recipes?.Count() ?? 0)</td>
+                        <td>
+                            @if (u.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Suspended</span>
+                            }
+                        </td>
+                        <td class="d-flex justify-content-center gap-1">
+                            <!-- 🔹 View Button -->
+                            <a class="btn btn-info btn-sm" asp-action="ViewUser" asp-route-id="@u.Id">
+                                <i class="bi bi-person-circle"></i> View
+                            </a>
+
+                            <!-- 🔸 Suspend/Activate Button -->
+                            <form asp-action="ToggleSuspend" method="post">
+                                <input type="hidden" name="id" value="@u.Id" />
+                                <button class="btn btn-warning btn-sm" type="submit">
+                                    <i class="bi bi-shield-exclamation"></i>
+                                    @(u.IsActive ? "Suspend" : "Activate")
+                                </button>
+                            </form>
+
+                            <!-- ❌ Delete Button -->
+                            <form asp-action="DeleteUser" method="post">
+                                <input type="hidden" name="id" value="@u.Id" />
+                                <button class="btn btn-danger btn-sm" type="submit">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!--  Recipes Panel -->
+    <div class="tab-pane fade" id="recipesPanel" role="tabpanel">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var recipe in Model.Recipes)
+                {
+                    <tr>
+                        <td>@recipe.Title</td>
+                        <td>@recipe.Author?.UserName</td>
+                        <td>@recipe.Category?.Name</td>
+                        <td>@recipe.CreatedDate?.ToShortDateString()</td>
+                        <td>
+                            <button class="btn btn-info btn-sm me-1">View</button>
+                            <button class="btn btn-danger btn-sm">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!--  Categories Panel -->
+    <div class="tab-pane fade" id="categoriesPanel" role="tabpanel">
+        <form method="post" class="d-flex mb-3" asp-action="AddCategory" asp-controller="Admin">
+            <input type="text" name="name" class="form-control me-2" placeholder="New category..." required />
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model.Categories)
+                {
+                    <tr>
+                        <td>@cat.Name</td>
+                        <td>
+                            <form method="post" asp-action="DeleteCategory" asp-controller="Admin">
+                                <input type="hidden" name="id" value="@cat.Id" />
+                                <button class="btn btn-outline-danger btn-sm" type="submit">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

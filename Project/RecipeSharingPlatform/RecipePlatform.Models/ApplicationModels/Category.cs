@@ -8,5 +8,7 @@ namespace RecipePlatform.Models.ApplicationModels
 {
     public class Category: BaseEntity
     {
+        public string? Name { get; set; }
+        public IEnumerable<Recipe> Recipes { get; set; } = new List<Recipe>();
     }
 }

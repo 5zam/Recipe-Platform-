@@ -20,3 +20,15 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+
+//my css.hero {
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+}
+
+.w-lg-50 {
+    max-width: 50%;
+}
