@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -27,8 +28,9 @@ namespace RecipePlatform.Models.ApplicationModels
         public ApplicationUser? Author { get; set; }
 
         [ForeignKey("CategoryId")]
+        [Required(ErrorMessage = "Please select a category")]
         public int CategoryId { get; set; }
-        public Category? Category { get; set; }
+        public Category Category { get; set; }
 
         public IEnumerable<Rating> Ratings { get; set; }= new List<Rating>();
     }

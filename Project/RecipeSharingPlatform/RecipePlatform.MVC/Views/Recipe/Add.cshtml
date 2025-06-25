@@ -1,0 +1,148 @@
+﻿@model RecipePlatform.MVC.Models.ViewModels.AddRecipeVM
+
+@{
+    ViewData["Title"] = "Add New Recipe";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Add New Recipe</h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <strong>Error:</strong> @TempData["ErrorMessage"]
+            @if (TempData["ErrorDetails"] != null)
+            {
+                <hr />
+                <div>@TempData["ErrorDetails"]</div>
+            }
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <form asp-action="Add" method="post">
+        <div class="mb-3">
+            <label asp-for="Recipe.Title" class="form-label"></label>
+            <input asp-for="Recipe.Title" class="form-control" />
+            <span asp-validation-for="Recipe.Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Recipe.Description" class="form-label"></label>
+            <textarea asp-for="Recipe.Description" class="form-control"></textarea>
+            <span asp-validation-for="Recipe.Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label>Ingredients</label>
+            <input type="text" id="ingredientInput" class="form-control mb-2" placeholder="Enter ingredient..." />
+            <button type="button" class="btn btn-secondary btn-sm mb-2" onclick="addIngredient()">+ Add Ingredient</button>
+            <ul id="ingredientsList" class="list-group mb-2"></ul>
+            <input type="hidden" name="Recipe.Ingredients" id="Ingredients" />
+        </div>
+
+        <div class="mb-3">
+            <label>Instructions</label>
+            <input type="text" id="stepInput" class="form-control mb-2" placeholder="Enter step..." />
+            <button type="button" class="btn btn-secondary btn-sm mb-2" onclick="addStep()">+ Add Step</button>
+            <ul id="stepsList" class="list-group mb-2"></ul>
+            <input type="hidden" name="Recipe.Instructions" id="Instructions" />
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label asp-for="Recipe.PrepTimeMinutes" class="form-label"></label>
+                <input asp-for="Recipe.PrepTimeMinutes" class="form-control" />
+                <span asp-validation-for="Recipe.PrepTimeMinutes" class="text-danger"></span>
+            </div>
+            <div class="col">
+                <label asp-for="Recipe.CookTimeMinutes" class="form-label"></label>
+                <input asp-for="Recipe.CookTimeMinutes" class="form-control" />
+                <span asp-validation-for="Recipe.CookTimeMinutes" class="text-danger"></span>
+            </div>
+            <div class="col">
+                <label asp-for="Recipe.Servings" class="form-label"></label>
+                <input asp-for="Recipe.Servings" class="form-control" />
+                <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Recipe.Difficulty" class="form-label"></label>
+            <select asp-for="Recipe.Difficulty" class="form-select" asp-items="Model.Difficulties">
+                <option value="">Select Difficulty</option>
+            </select>
+            <span asp-validation-for="Recipe.Difficulty" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Recipe.CategoryId" class="form-label">Category</label>
+            <select asp-for="Recipe.CategoryId" asp-items="Model.Categories" class="form-control">
+                <option value="">-- Select Category --</option>
+            </select>
+            <span asp-validation-for="Recipe.CategoryId" class="text-danger"></span>
+        </div>
+
+
+        <button type="submit" class="btn btn-success">Add Recipe</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        let ingredients = [];
+        let steps = [];
+
+        function addIngredient() {
+            const input = document.getElementById("ingredientInput");
+            if (input.value.trim() !== "") {
+                ingredients.push(input.value.trim());
+                renderList("ingredientsList", ingredients);
+                document.getElementById("Ingredients").value = ingredients.join(" || ");
+                input.value = "";
+            }
+        }
+
+        function addStep() {
+            const input = document.getElementById("stepInput");
+            if (input.value.trim() !== "") {
+                steps.push(input.value.trim());
+                renderList("stepsList", steps);
+                document.getElementById("Instructions").value = steps.join(" || ");
+                input.value = "";
+            }
+        }
+
+        function renderList(id, items) {
+            const ul = document.getElementById(id);
+            ul.innerHTML = "";
+            items.forEach(item => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = item;
+                ul.appendChild(li);
+            });
+        }
+    </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const categorySelect = document.getElementById("Recipe_CategoryId");
+
+            if (categorySelect) {
+                categorySelect.addEventListener("change", function () {
+                    console.log("Selected CategoryId:", this.value);
+                });
+            }
+        });
+    </script>
+
+
+}
