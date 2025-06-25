@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using RecipePlatform.BLL.Interfaces;
 using RecipePlatform.DAL.Context;
 using RecipePlatform.Models.ApplicationModels;
@@ -21,9 +22,11 @@ namespace RecipePlatform.BLL.Repositories
 
         public async Task<List<Recipe>> GetRecipesByUserId(string userId)
         {
-            return _context.Recipes
-                           .Where(r => r.AuthorId == userId)
-                           .ToList();
+            return await _context.Recipes
+                         .Include(r => r.Ingredients)
+                         .Include(r => r.Instructions)
+                         .Where(r => r.AuthorId == userId)
+                         .ToListAsync();
         }
     }
 }

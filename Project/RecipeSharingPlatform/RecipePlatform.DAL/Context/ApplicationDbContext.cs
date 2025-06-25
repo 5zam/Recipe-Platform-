@@ -29,6 +29,8 @@ namespace RecipePlatform.DAL.Context
         public DbSet<Category> Categories { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<Rating> Rates { get; set; }
+        public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+        public DbSet<RecipeInstruction> RecipeInstructions { get; set; }
 
     }
 }

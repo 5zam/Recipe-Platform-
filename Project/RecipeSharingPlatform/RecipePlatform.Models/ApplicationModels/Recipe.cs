@@ -14,8 +14,6 @@ namespace RecipePlatform.Models.ApplicationModels
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public string? Ingredients { get; set; }
-        public string? Instructions { get; set; }
         public int? PrepTimeMinutes { get; set; }
         public int? CookTimeMinutes { get; set; }
         public int? Servings { get; set; }
@@ -31,6 +29,9 @@ namespace RecipePlatform.Models.ApplicationModels
         [Required(ErrorMessage = "Please select a category")]
         public int CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public ICollection<RecipeIngredient> Ingredients { get; set; } = new List<RecipeIngredient>();
+        public ICollection<RecipeInstruction> Instructions { get; set; } = new List<RecipeInstruction>();
 
         public IEnumerable<Rating> Ratings { get; set; }= new List<Rating>();
     }

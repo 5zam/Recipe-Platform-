@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -31,4 +31,164 @@ body {
 
 .w-lg-50 {
     max-width: 50%;
+}
+
+
+//my css
+/* تصميم إضافي لصفحة إضافة الوصفة */
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+    .form-label i {
+        margin-right: 8px;
+        color: #007bff;
+    }
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+/* تصميم الحقول الديناميكية */
+.ingredient-item,
+.instruction-item {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.input-group-text.step-number {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #007bff;
+    min-width: 45px;
+    justify-content: center;
+}
+
+.remove-ingredient,
+.remove-instruction {
+    border: 2px solid #dc3545;
+    transition: all 0.3s ease;
+}
+
+    .remove-ingredient:hover,
+    .remove-instruction:hover {
+        background-color: #dc3545;
+        transform: scale(1.05);
+    }
+
+/* تصميم الأزرار */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+}
+
+.btn-outline-success {
+    border: 2px solid #28a745;
+    color: #28a745;
+}
+
+    .btn-outline-success:hover {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    border: none;
+}
+
+/* رسائل التحقق */
+.text-danger {
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: block;
+}
+
+/* تحسين العرض على الموبايل */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .card {
+        margin: 10px 0;
+    }
+
+    .input-group {
+        flex-wrap: nowrap;
+    }
+
+    .input-group-text.step-number {
+        min-width: 40px;
+        font-size: 0.875rem;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        font-size: 0.875rem;
+    }
+}
+
+/* تأثيرات إضافية */
+.form-control:valid {
+    border-color: #28a745;
+}
+
+.form-control:invalid {
+    border-color: #dc3545;
+}
+
+/* تحسين عرض textarea */
+textarea.form-control {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* تأثير hover للكارد */
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RecipePlatform.DAL.Context;
 
@@ -11,9 +12,11 @@ using RecipePlatform.DAL.Context;
 namespace RecipePlatform.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250625050145_recipe update")]
+    partial class recipeupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,6 +230,12 @@ namespace RecipePlatform.DAL.Migrations
                     b.Property<int?>("Difficulty")
                         .HasColumnType("int");
 
+                    b.Property<string>("Ingredients")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Instructions")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("PrepTimeMinutes")
                         .HasColumnType("int");
 
@@ -243,59 +252,6 @@ namespace RecipePlatform.DAL.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Recipes");
-                });
-
-            modelBuilder.Entity("RecipePlatform.Models.ApplicationModels.RecipeIngredient", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Quantity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("RecipeIngredients");
-                });
-
-            modelBuilder.Entity("RecipePlatform.Models.ApplicationModels.RecipeInstruction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StepNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("RecipeInstructions");
                 });
 
             modelBuilder.Entity("RecipePlatform.Models.UserModels.ApplicationUser", b =>
@@ -456,28 +412,6 @@ namespace RecipePlatform.DAL.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("RecipePlatform.Models.ApplicationModels.RecipeIngredient", b =>
-                {
-                    b.HasOne("RecipePlatform.Models.ApplicationModels.Recipe", "Recipe")
-                        .WithMany("Ingredients")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Recipe");
-                });
-
-            modelBuilder.Entity("RecipePlatform.Models.ApplicationModels.RecipeInstruction", b =>
-                {
-                    b.HasOne("RecipePlatform.Models.ApplicationModels.Recipe", "Recipe")
-                        .WithMany("Instructions")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Recipe");
-                });
-
             modelBuilder.Entity("RecipePlatform.Models.ApplicationModels.Category", b =>
                 {
                     b.Navigation("Recipes");
@@ -485,10 +419,6 @@ namespace RecipePlatform.DAL.Migrations
 
             modelBuilder.Entity("RecipePlatform.Models.ApplicationModels.Recipe", b =>
                 {
-                    b.Navigation("Ingredients");
-
-                    b.Navigation("Instructions");
-
                     b.Navigation("Ratings");
                 });
 
