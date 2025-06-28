@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|c:\\users\\user pc\\onedrive\\desktop\\makken\\tastebud project\\project\\recipesharingplatform\\recipeplatform.mvc\\views\\recipe\\add.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|solutionrelative:recipeplatform.mvc\\views\\recipe\\add.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|c:\\users\\user pc\\onedrive\\desktop\\makken\\tastebud project\\project\\recipesharingplatform\\recipeplatform.mvc\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|solutionrelative:recipeplatform.mvc\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|c:\\users\\user pc\\onedrive\\desktop\\makken\\tastebud project\\project\\recipesharingplatform\\recipeplatform.mvc\\controllers\\recipecontroller .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|solutionrelative:recipeplatform.mvc\\controllers\\recipecontroller .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|c:\\users\\user pc\\onedrive\\desktop\\makken\\tastebud project\\project\\recipesharingplatform\\recipeplatform.mvc\\views\\recipe\\add.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{8333938D-7AB5-47E1-A3FE-6DBFB831A8CB}|RecipePlatform.MVC\\RecipePlatform.MVC.csproj|solutionrelative:recipeplatform.mvc\\views\\recipe\\add.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -27,27 +27,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Add.cshtml",
-              "DocumentMoniker": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml",
-              "RelativeDocumentMoniker": "RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml",
-              "ToolTip": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml*",
-              "RelativeToolTip": "RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml*",
-              "ViewState": "AgIAADcBAAAAAAAAAAAuwE4BAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-06-25T14:41:15.096Z",
+              "Title": "UserController.cs",
+              "DocumentMoniker": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Controllers\\UserController.cs",
+              "RelativeDocumentMoniker": "RecipePlatform.MVC\\Controllers\\UserController.cs",
+              "ToolTip": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Controllers\\UserController.cs",
+              "RelativeToolTip": "RecipePlatform.MVC\\Controllers\\UserController.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAQwDYAAABUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-28T08:38:32.786Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "RecipeController .cs",
-              "DocumentMoniker": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Controllers\\RecipeController .cs",
-              "RelativeDocumentMoniker": "RecipePlatform.MVC\\Controllers\\RecipeController .cs",
-              "ToolTip": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Controllers\\RecipeController .cs*",
-              "RelativeToolTip": "RecipePlatform.MVC\\Controllers\\RecipeController .cs*",
-              "ViewState": "AgIAADYBAAAAAAAAAAAqwFgBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-25T14:40:08.158Z",
+              "Title": "Add.cshtml",
+              "DocumentMoniker": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml",
+              "RelativeDocumentMoniker": "RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml",
+              "ToolTip": "C:\\Users\\user pc\\OneDrive\\Desktop\\Makken\\TasteBud Project\\Project\\RecipeSharingPlatform\\RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml",
+              "RelativeToolTip": "RecipePlatform.MVC\\Views\\Recipe\\Add.cshtml",
+              "ViewState": "AgIAALUAAAAAAAAAAAAuwMwAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-06-28T08:23:08.96Z",
               "EditorCaption": ""
             }
           ]

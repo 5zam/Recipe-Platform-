@@ -1,0 +1,120 @@
+﻿/* ===== ADD TO EXISTING rating.css FILE ===== */
+
+/* MODAL RATING SYSTEM - CLEAN STARS */
+.modal-stars-container {
+    padding: 20px 0;
+}
+
+.modal-stars {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+}
+
+.modal-rating-star {
+    font-size: 3rem !important;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 8px;
+    /* REMOVE ALL BACKGROUND SHAPES */
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    /* Font Awesome fix */
+    font-family: "Font Awesome 6 Free", serif !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+    line-height: 1 !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+    .modal-rating-star:hover {
+        color: #fbbf24;
+        transform: scale(1.1);
+        background: rgba(251, 191, 36, 0.1) !important;
+    }
+
+    .modal-rating-star.selected {
+        color: #f59e0b;
+    }
+
+    .modal-rating-star:focus {
+        outline: 2px solid #3b82f6 !important;
+        outline-offset: 2px !important;
+        background: rgba(59, 130, 246, 0.1) !important;
+    }
+
+    /* Fallback star symbols for modal */
+    .modal-rating-star::before {
+        content: "★";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: inherit;
+        color: inherit;
+        z-index: -1;
+        font-family: serif;
+    }
+
+.rating-feedback-modal {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6b7280;
+    min-height: 30px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+/* Modal improvements */
+.modal-content {
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    border-radius: 15px;
+}
+
+.modal-header {
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+}
+
+/* Button alignments */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+/* Responsive adjustments for modal */
+@media (max-width: 768px) {
+    .modal-rating-star {
+        font-size: 2.5rem !important;
+    }
+
+    .modal-stars {
+        gap: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-rating-star {
+        font-size: 2rem !important;
+    }
+
+    .modal-stars {
+        gap: 8px;
+    }
+}

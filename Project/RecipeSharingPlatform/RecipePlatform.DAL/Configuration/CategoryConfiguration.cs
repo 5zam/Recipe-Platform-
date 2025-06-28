@@ -15,10 +15,22 @@ namespace RecipePlatform.DAL.Configuration
         {
             //throw new NotImplementedException();
 
-            builder.HasMany(c => c.Recipes)
-                  .WithOne(r => r.Category)
-                  .HasForeignKey(r => r.CategoryId)
-                  .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasKey(c => c.Id);
+
+            builder.Property(c => c.Name)
+                   .IsRequired()
+                   .HasMaxLength(100);
+
+            // Unique constraint for category name
+            builder.HasIndex(c => c.Name)
+                   .IsUnique();
+
+
+            //builder.HasMany(c => c.Recipes)
+            //      .WithOne(r => r.Category)
+            //      .HasForeignKey(r => r.CategoryId)
+            //      .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

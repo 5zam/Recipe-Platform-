@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RecipePlatform.BLL.Interfaces;
 using RecipePlatform.BLL.Repositories;
@@ -25,6 +25,8 @@ namespace RecipePlatform.MVC
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IRecipeService, RecipeService>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
+            builder.Services.AddScoped<IRatingService, EnhancedRatingService>();
 
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -51,8 +53,8 @@ namespace RecipePlatform.MVC
 
             app.UseRouting();
             //
-            //app.UseAuthentication();
-            //app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",

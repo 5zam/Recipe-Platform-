@@ -1,194 +1,321 @@
-﻿html {
-  font-size: 14px;
+﻿/* إصلاح Footer ليكون دائماً في الأسفل */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+/* استخدام Bootstrap classes للـ Flexbox */
+.footer {
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+    color: #6c757d;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* إصلاح البطاقات - إزالة الصور */
+.recipe-card-clean {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 280px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 15px;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    .recipe-card-clean:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+        border-color: #0d6efd;
+    }
+
+/* تحسين Typography */
+.recipe-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #333;
+    margin-bottom: 0.75rem;
 }
 
-body {
-  margin-bottom: 60px;
+.recipe-description {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #6c757d;
+    margin-bottom: 1rem;
 }
 
+/* تحسين Badges */
+.badge-rounded {
+    border-radius: 20px;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+}
 
+.badge-difficulty-easy {
+    background-color: #198754;
+    color: white;
+}
 
-//my css.hero {
-    min-height: 380px;
+.badge-difficulty-medium {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-difficulty-hard {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* تحسين معلومات الوصفة */
+.recipe-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+
+.recipe-meta-item {
+    display: flex;
+    align-items: center;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+    .recipe-meta-item i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+/* تحسين التقييمات */
+.rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+    .rating-stars i {
+        font-size: 1rem;
+    }
+
+.rating-score {
+    margin-left: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* تحسين معلومات المؤلف */
+.author-info {
+    display: flex;
+    align-items: center;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+    .author-info i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+.author-name {
+    font-weight: 500;
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+    .author-name:hover {
+        text-decoration: underline;
+        color: #0a58ca;
+    }
+
+/* تحسين الأزرار للمطبخ */
+.btn-kitchen {
+    min-height: 48px;
+    min-width: 48px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+    .btn-kitchen:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+/* تحسين البحث */
+.search-input-large {
+    min-height: 60px;
+    font-size: 1.1rem;
+    border-radius: 15px;
+    border: 2px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+
+    .search-input-large:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+/* تحسين الشبكة */
+.recipe-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+@media (max-width: 768px) {
+    .recipe-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .recipe-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* تحسين النصوص للقراءة السهلة */
+.text-large {
+    font-size: 1.1rem;
+}
+
+.text-readable {
+    line-height: 1.6;
+}
+
+/* إصلاح مشاكل التوافق */
+.card-body-clean {
+    padding: 1.5rem;
+}
+
+.section-spacing {
+    padding: 3rem 0;
+}
+
+/* تحسين الألوان */
+.text-primary-custom {
+    color: #0d6efd;
+}
+
+.text-muted-readable {
+    color: #495057;
+}
+
+.bg-light-custom {
+    background-color: #f8f9fa;
+}
+
+/* إصلاح مشاكل المرونة */
+.d-flex-responsive {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media (max-width: 576px) {
+    .d-flex-responsive {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+}
+
+/* تحسينات إضافية للـ Layout */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hero {
+    min-height: 400px;
     display: flex;
     align-items: center;
 }
 
-.w-lg-50 {
-    max-width: 50%;
+/* تحسين الـ Container */
+.container, .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
-
-//my css
-/* تصميم إضافي لصفحة إضافة الوصفة */
-.card {
-    border: none;
-    border-radius: 15px;
+/* تحسين المسافات */
+section {
+    padding: 2rem 0;
 }
 
-.card-header {
-    border-radius: 15px 15px 0 0 !important;
-    background: linear-gradient(135deg, #007bff, #0056b3);
+/* تحسين الروابط */
+a {
+    transition: color 0.3s ease;
 }
 
-.form-label {
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 8px;
-}
-
-    .form-label i {
-        margin-right: 8px;
-        color: #007bff;
+    a:hover {
+        text-decoration: none;
     }
 
-.form-control {
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+/* تحسين النماذج */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-    .form-control:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-
-/* تصميم الحقول الديناميكية */
-.ingredient-item,
-.instruction-item {
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.input-group-text.step-number {
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-    border: 2px solid #007bff;
-    min-width: 45px;
-    justify-content: center;
-}
-
-.remove-ingredient,
-.remove-instruction {
-    border: 2px solid #dc3545;
-    transition: all 0.3s ease;
-}
-
-    .remove-ingredient:hover,
-    .remove-instruction:hover {
-        background-color: #dc3545;
-        transform: scale(1.05);
-    }
-
-/* تصميم الأزرار */
+/* تحسين الأزرار */
 .btn {
-    border-radius: 8px;
-    font-weight: 500;
-    padding: 10px 20px;
     transition: all 0.3s ease;
 }
 
     .btn:hover {
+        transform: translateY(-1px);
+    }
+
+/* CSS styles for MyRecipes page */
+.recipe-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: none;
+    border-left: 4px solid #007bff;
+}
+
+    .recipe-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
     }
 
-.btn-success {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    border: none;
+.recipe-stats {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
 }
 
-.btn-outline-success {
-    border: 2px solid #28a745;
-    color: #28a745;
+.btn-group .btn {
+    flex: 1;
 }
 
-    .btn-outline-success:hover {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-
-.btn-secondary {
-    background: linear-gradient(135deg, #6c757d, #5a6268);
-    border: none;
+.card-title {
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-/* رسائل التحقق */
-.text-danger {
-    font-size: 0.875rem;
-    margin-top: 5px;
-    display: block;
+.card-text {
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
 
-/* تحسين العرض على الموبايل */
+/* إصلاح الـ CSS المفقود */
 @media (max-width: 768px) {
-    .container {
-        padding: 10px;
+    .btn-group {
+        flex-direction: column;
     }
 
-    .card {
-        margin: 10px 0;
-    }
-
-    .input-group {
-        flex-wrap: nowrap;
-    }
-
-    .input-group-text.step-number {
-        min-width: 40px;
-        font-size: 0.875rem;
-    }
-
-    .btn {
-        padding: 8px 15px;
-        font-size: 0.875rem;
-    }
+        .btn-group .btn {
+            margin-bottom: 5px;
+        }
 }
 
-/* تأثيرات إضافية */
-.form-control:valid {
-    border-color: #28a745;
-}
-
-.form-control:invalid {
-    border-color: #dc3545;
-}
-
-/* تحسين عرض textarea */
-textarea.form-control {
-    resize: vertical;
-    min-height: 60px;
-}
-
-/* تأثير hover للكارد */
-.card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
+/* CSS for User Profile page */
+.user-stat-item {
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    margin: 0.5rem;
 }

@@ -17,4 +17,8 @@
     <ProjectReference Include="..\RecipePlatform.BLL\RecipePlatform.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Search\" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,154 @@
+﻿@model RecipePlatform.MVC.Models.ViewModels.UserProfileViewModel
+@{
+    ViewData["Title"] = $"{Model.User.UserName}'s Profile";
+}
+
+<div class="container my-4">
+    <!-- User Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-4x text-primary"></i>
+                    </div>
+                    <h3 class="card-title">@Model.User.UserName</h3>
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-calendar-alt"></i>
+                        Joined @Model.JoinedDate.ToString("MMMM yyyy")
+                    </p>
+
+                    <!-- User Stats -->
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="user-stat-item">
+                                <h4 class="text-primary">@Model.TotalRecipes</h4>
+                                <small class="text-muted">Recipes</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="user-stat-item">
+                                <h4 class="text-warning">@Model.AverageRating.ToString("F1")</h4>
+                                <small class="text-muted">Avg Rating</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="user-stat-item">
+                                <h4 class="text-success">@Model.TotalRatingsReceived</h4>
+                                <small class="text-muted">Total Ratings</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.IsOwnProfile)
+                    {
+                        <div class="mt-3">
+                            <a asp-controller="Recipe" asp-action="MyRecipes" class="btn btn-primary">
+                                <i class="fas fa-cog"></i> Manage My Recipes
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User's Recipes -->
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="mb-3">
+                <i class="fas fa-book"></i>
+                @Model.User.UserName's Recipes (@Model.TotalRecipes)
+            </h4>
+
+            @if (Model.Recipes != null && Model.Recipes.Any())
+            {
+                <div class="row">
+                    @foreach (var recipe in Model.Recipes)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body d-flex flex-column">
+                                    <!-- Recipe Title -->
+                                    <h5 class="card-title text-primary mb-2">
+                                        <a asp-controller="Recipe" asp-action="Details" asp-route-id="@recipe.Id"
+                                           class="text-decoration-none">
+                                            @recipe.Title
+                                        </a>
+                                    </h5>
+
+                                    <!-- Recipe Meta -->
+                                    <div class="recipe-meta mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar"></i> @(recipe.CreatedDate?.ToString("MMM dd, yyyy") ?? "N/A")
+                                        </small>
+                                        @if (recipe.Category != null)
+                                        {
+                                            <span class="badge bg-secondary ms-2">@recipe.Category.Name</span>
+                                        }
+                                        @if (recipe.Difficulty != null)
+                                        {
+                                            <span class="badge bg-info ms-1">@recipe.Difficulty</span>
+                                        }
+                                    </div>
+
+                                    <!-- Description -->
+                                    <p class="card-text text-muted flex-grow-1">
+                                        @if (!string.IsNullOrEmpty(recipe.Description))
+                                        {
+                                            @(recipe.Description.Length > 100 ?
+                                                recipe.Description.Substring(0, 100) + "..." :
+                                                recipe.Description)
+                                        }
+                                        else
+                                        {
+                                            <em>No description provided</em>
+                                        }
+                                    </p>
+
+                                    <!-- Recipe Stats -->
+                                    <div class="recipe-stats mb-3">
+                                        <small class="text-muted">
+                                            @if (recipe.PrepTimeMinutes.HasValue && recipe.PrepTimeMinutes > 0)
+                                            {
+                                                <span><i class="fas fa-clock"></i> @($"{recipe.PrepTimeMinutes} min")</span>
+                                            }
+                                            @if (recipe.Servings.HasValue && recipe.Servings > 0)
+                                            {
+                                                <span><i class="fas fa-users ms-2"></i> @($"{recipe.Servings} serves")</span>
+                                            }
+                                            @if (recipe.Ratings?.Any() == true)
+                                            {
+                                                var avgRating = recipe.Ratings.Average(r => r.RateValue);
+                                                <span><i class="fas fa-star text-warning ms-2"></i> @($"{avgRating:F1} ({recipe.Ratings.Count()})")</span>
+                                            }
+                                        </small>
+                                    </div>
+
+                                    <!-- View Button -->
+                                    <div class="mt-auto">
+                                        <a asp-controller="Recipe" asp-action="Details" asp-route-id="@recipe.Id"
+                                           class="btn btn-outline-primary btn-sm w-100">
+                                            <i class="fas fa-eye"></i> View Recipe
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-utensils fa-4x text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">No recipes yet!</h5>
+                    <p class="text-muted">@Model.User.UserName hasn't shared any recipes.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

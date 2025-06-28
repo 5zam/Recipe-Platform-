@@ -1,51 +1,338 @@
-﻿<section class="hero text-center text-white py-5" style="background:linear-gradient(135deg,#ff7e00,#ff4800)">
+﻿@model RecipePlatform.MVC.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Discover Amazing Recipes";
+}
+
+
+
+
+<!-- Hero Section -->
+<section class="hero text-center text-white py-5" style="background:linear-gradient(135deg,#ff7e00,#ff4800)">
     <div class="container">
-        <h1 class="display-4 fw-bold">Discover Amazing Recipes</h1>
-        <p class="lead mb-4">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="bi bi-egg-fried fs-1 me-3"></i>
+            Discover Amazing Recipes
+        </h1>
+        <p class="lead mb-5 fs-5">
             Share your culinary creations and explore thousands of delicious recipes
             from home cooks around the world
         </p>
 
-        <form class="d-flex justify-content-center" asp-controller="Recipes" asp-action="Search" method="get">
-            <div class="input-group w-75 w-lg-50">
-                <input class="form-control form-control-lg" type="text" name="q"
-                       placeholder="Search for recipes, ingredients, cuisines…" />
-                <button class="btn btn-lg btn-outline-light px-4" type="submit">Search</button>
+        <!-- Search Form - Kitchen Friendly Design -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 col-md-10">
+                <form asp-controller="Home" asp-action="Search" method="get">
+                    <div class="input-group input-group-lg">
+                        <input class="form-control form-control-lg"
+                               type="text"
+                               name="q"
+                               placeholder="Search recipes or ingredients..."
+                               style="border-radius: 15px 0 0 15px; border: 3px solid #fff; min-height: 60px; font-size: 1.2rem;" />
+                        <button class="btn btn-light btn-lg px-5 fw-bold"
+                                type="submit"
+                                style="border-radius: 0 15px 15px 0; border: 3px solid #fff; min-height: 60px; font-size: 1.2rem;">
+                            <i class="bi bi-search me-2"></i>Search
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
+
+        <p class="fs-6 opacity-75">
+            <i class="bi bi-lightbulb me-1"></i>
+            Try: "chicken", "pasta", "tomatoes", "quick meals"
+        </p>
     </div>
 </section>
 
-<section class="py-5">
+<!-- Latest Recipes Section -->
+<section class="section-spacing bg-light-custom">
     <div class="container">
-        <h3 class="mb-4">
-            <i class="bi bi-clock-history text-warning"></i> Latest Recipes
-        </h3>
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="mb-0 fw-bold">
+                    <i class="bi bi-clock-history text-warning me-2"></i>
+                    Latest Recipes
+                </h2>
+                <p class="text-muted-readable fs-5">Fresh ideas from our cooking community</p>
+            </div>
+        </div>
 
-        <div class="row g-4">
-            @* لاحقاً: loop على Model *@
-            @* <div class="col-md-4"> *@
-            @*     <div class="card h-100 shadow-sm"> *@
-            @*         <img src="~/img/cookie.jpg" class="card-img-top" alt="..." /> *@
-            @*         <div class="card-body"> *@
-            @*             <h5 class="card-title mb-1">Classic Chocolate Chip Cookies</h5> *@
-            @*             <p class="card-text small text-muted">Soft, chewy cookies perfect for any occasion.</p> *@
-            @*         </div> *@
-            @*         <div class="card-footer bg-transparent border-0 d-flex justify-content-between small"> *@
-            @*             <span><i class="bi bi-clock"></i> 27m</span> *@
-            @*             <span><i class="bi bi-star-fill text-warning"></i> 4.8</span> *@
-            @*         </div> *@
-            @*     </div> *@
-            @* </div> *@
-            <!-- كرّر الكارت -->
+        <div class="recipe-grid">
+            @if (Model.LatestRecipes?.Any() == true)
+            {
+                @foreach (var recipe in Model.LatestRecipes)
+                {
+                    <a asp-controller="Recipe" asp-action="Details" asp-route-id="@recipe.Id" class="text-decoration-none">
+                        <div class="card recipe-card-clean h-100">
+                            <div class="card-body-clean">
+                                <!-- Header: Title and Difficulty -->
+                                <div class="d-flex-responsive mb-3">
+                                    <h5 class="recipe-title mb-0">
+                                        @recipe.Title
+                                    </h5>
+                                    @if (recipe.Difficulty.HasValue)
+                                    {
+                                        var difficultyClass = recipe.Difficulty.ToString() switch
+                                        {
+                                            "Easy" => "badge-difficulty-easy",
+                                            "Medium" => "badge-difficulty-medium",
+                                            "Hard" => "badge-difficulty-hard",
+                                            _ => "badge-secondary"
+                                        };
+                                        <span class="badge @difficultyClass badge-rounded">
+                                            @recipe.Difficulty
+                                        </span>
+                                    }
+                                </div>
+
+                                <!-- Description -->
+                                <p class="recipe-description">
+                                    @(recipe.Description?.Length > 120 ? recipe.Description.Substring(0, 120) + "..." : recipe.Description)
+                                </p>
+
+                                <!-- Category -->
+                                @if (recipe.Category != null)
+                                {
+                                    <span class="badge bg-primary badge-rounded mb-3">
+                                        @recipe.Category.Name
+                                    </span>
+                                }
+
+                                <!-- Recipe Meta Info -->
+                                <div class="recipe-meta">
+                                    @if (recipe.PrepTimeMinutes.HasValue && recipe.CookTimeMinutes.HasValue)
+                                    {
+                                        <div class="recipe-meta-item">
+                                            <i class="bi bi-clock"></i>
+                                            <span>@((recipe.PrepTimeMinutes + recipe.CookTimeMinutes).Value) min</span>
+                                        </div>
+                                    }
+
+                                    @if (recipe.Servings.HasValue)
+                                    {
+                                        <div class="recipe-meta-item">
+                                            <i class="bi bi-people"></i>
+                                            <span>@recipe.Servings servings</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Footer: Author and Rating -->
+                                <div class="d-flex-responsive">
+                                    <div class="author-info">
+                                        <i class="bi bi-person-circle"></i>
+                                        <span>by @(recipe.Author?.UserName ?? "Unknown")</span>
+                                    </div>
+
+                                    <!-- Rating -->
+                                    <div class="rating-stars">
+                                        @if (recipe.Ratings?.Any() == true)
+                                        {
+                                            var avgRating = recipe.Ratings.Average(r => r.RateValue);
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= Math.Round(avgRating))
+                                                {
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                }
+                                                else if (i - 0.5 <= avgRating)
+                                                {
+                                                    <i class="bi bi-star-half text-warning"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star text-muted"></i>
+                                                }
+                                            }
+                                            <span class="rating-score">@avgRating.ToString("F1")</span>
+                                        }
+                                        else
+                                        {
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="bi bi-star text-muted"></i>
+                                            }
+                                            <span class="text-muted">No rating</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-journal-x fs-1 text-muted mb-3"></i>
+                    <h4 class="text-muted">No recipes yet</h4>
+                    <p class="text-muted">Be the first to share a delicious recipe!</p>
+                </div>
+            }
         </div>
     </div>
 </section>
-<section class="py-5 text-center text-white"
-         style="background:linear-gradient(135deg,#00c97b,#00a87b)">
+
+<!-- Top Rated Recipes Section -->
+<section class="section-spacing">
     <div class="container">
-        <h3 class="mb-3 fw-bold">Ready to Share Your Recipe?</h3>
-        <p class="lead mb-4">Join our community of passionate cooks and share your favorite recipes with the world</p>
-        <a class="btn btn-light btn-lg px-4" asp-controller="Account" asp-action="Register">Get Started Today</a>
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="mb-0 fw-bold">
+                    <i class="bi bi-star-fill text-warning me-2"></i>
+                    Top Rated Recipes
+                </h2>
+                <p class="text-muted-readable fs-5">Community favorites you'll love</p>
+            </div>
+        </div>
+
+        <div class="recipe-grid">
+            @if (Model.TopRatedRecipes?.Any() == true)
+            {
+                @foreach (var recipe in Model.TopRatedRecipes)
+                {
+                    <a asp-controller="Recipe" asp-action="Details" asp-route-id="@recipe.Id" class="text-decoration-none">
+                        <div class="card recipe-card-clean h-100 border-warning" style="border-width: 2px;">
+                            <div class="card-body-clean">
+                                <!-- Header: Title and Badges -->
+                                <div class="d-flex-responsive mb-3">
+                                    <h5 class="recipe-title mb-0">
+                                        @recipe.Title
+                                    </h5>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-warning text-dark badge-rounded">
+                                            <i class="bi bi-award me-1"></i>Top
+                                        </span>
+                                        @if (recipe.Difficulty.HasValue)
+                                        {
+                                            var difficultyClass = recipe.Difficulty.ToString() switch
+                                            {
+                                                "Easy" => "badge-difficulty-easy",
+                                                "Medium" => "badge-difficulty-medium",
+                                                "Hard" => "badge-difficulty-hard",
+                                                _ => "badge-secondary"
+                                            };
+                                            <span class="badge @difficultyClass badge-rounded">
+                                                @recipe.Difficulty
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <p class="recipe-description">
+                                    @(recipe.Description?.Length > 120 ? recipe.Description.Substring(0, 120) + "..." : recipe.Description)
+                                </p>
+
+                                <!-- Category -->
+                                @if (recipe.Category != null)
+                                {
+                                    <span class="badge bg-primary badge-rounded mb-3">
+                                        @recipe.Category.Name
+                                    </span>
+                                }
+
+                                <!-- Recipe Meta Info -->
+                                <div class="recipe-meta">
+                                    @if (recipe.PrepTimeMinutes.HasValue && recipe.CookTimeMinutes.HasValue)
+                                    {
+                                        <div class="recipe-meta-item">
+                                            <i class="bi bi-clock"></i>
+                                            <span>@((recipe.PrepTimeMinutes + recipe.CookTimeMinutes).Value) min</span>
+                                        </div>
+                                    }
+
+                                    @if (recipe.Servings.HasValue)
+                                    {
+                                        <div class="recipe-meta-item">
+                                            <i class="bi bi-people"></i>
+                                            <span>@recipe.Servings servings</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Footer: Author and Rating -->
+                                <div class="d-flex-responsive">
+                                    <div class="author-info">
+                                        <i class="bi bi-person-circle"></i>
+                                        <span>by @(recipe.Author?.UserName ?? "Unknown")</span>
+                                    </div>
+
+                                    <!-- Rating -->
+                                    <div class="rating-stars">
+                                        @if (recipe.Ratings?.Any() == true)
+                                        {
+                                            var avgRating = recipe.Ratings.Average(r => r.RateValue);
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= Math.Round(avgRating))
+                                                {
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                }
+                                                else if (i - 0.5 <= avgRating)
+                                                {
+                                                    <i class="bi bi-star-half text-warning"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star text-muted"></i>
+                                                }
+                                            }
+                                            <span class="rating-score">@avgRating.ToString("F1")</span>
+                                        }
+                                        else
+                                        {
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="bi bi-star text-muted"></i>
+                                            }
+                                            <span class="text-muted">No rating</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-star fs-1 text-muted mb-3"></i>
+                    <h4 class="text-muted">No rated recipes yet</h4>
+                    <p class="text-muted">Start rating recipes to see the best ones here!</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 text-center text-white" style="background:linear-gradient(135deg,#00c97b,#00a87b)">
+    <div class="container">
+        <h3 class="mb-3 fw-bold fs-2">
+            <i class="bi bi-plus-circle fs-1 me-3"></i>
+            Ready to Share Your Recipe?
+        </h3>
+        <p class="lead mb-4 fs-5">
+            Join our community of passionate cooks and share your favorite recipes with the world
+        </p>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a class="btn btn-light btn-lg px-5 py-3 fs-4 fw-bold btn-kitchen"
+               asp-controller="Recipe"
+               asp-action="Create">
+                <i class="bi bi-plus-lg me-2"></i>Add Your Recipe
+            </a>
+        }
+        else
+        {
+            <a class="btn btn-light btn-lg px-5 py-3 fs-4 fw-bold btn-kitchen"
+               asp-controller="Account"
+               asp-action="Register">
+                <i class="bi bi-person-plus me-2"></i>Get Started Today
+            </a>
+        }
     </div>
 </section>

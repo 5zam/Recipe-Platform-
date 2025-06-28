@@ -1,20 +1,21 @@
-﻿@model RecipePlatform.MVC.Models.ViewModels.AddRecipeVM
+﻿@model RecipePlatform.MVC.Models.ViewModels.EditRecipeVM
 @{
-    ViewData["Title"] = "Add New Recipe";
+    ViewData["Title"] = "Edit Recipe";
 }
 
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-warning text-dark">
                     <h4 class="mb-0">
-                        <i class="fas fa-plus"></i> Add New Recipe
+                        <i class="fas fa-edit"></i> Edit Recipe: @Model.Recipe.Title
                     </h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Add" method="post">
+                    <form asp-action="EditRecipe" method="post">
                         @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Recipe.Id" />
 
                         <!-- Recipe Basic Info -->
                         <div class="row">
@@ -68,50 +69,83 @@
                             </div>
                         </div>
 
-                        <!-- Ingredients Section - مع الأزرار الأصلية الأفضل -->
+                        <!-- Ingredients Section -->
                         <div class="mb-4">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-list-ul"></i> Ingredients *
-                            </h5>
-                            <div id="ingredientsContainer">
-                                <div class="ingredient-item mb-2">
-                                    <div class="input-group">
-                                        <input name="IngredientsList[0]" class="form-control" placeholder="Enter ingredient" />
-                                        <button type="button" class="btn btn-outline-danger" onclick="removeIngredient(this)">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-primary">
+                                    <i class="fas fa-list-ul"></i> Ingredients *
+                                </h5>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addIngredient()">
+                                    <i class="fas fa-plus"></i> Add Ingredient
+                                </button>
                             </div>
-                            <!-- ✅ زر الإضافة الأصلي الأفضل -->
-                            <button type="button" class="btn btn-success mt-2" onclick="addIngredient()">
-                                <i class="fas fa-plus"></i> Add Ingredient
-                            </button>
-                            <span asp-validation-for="IngredientsList" class="text-danger d-block"></span>
+                            <div id="ingredientsContainer">
+                                @for (int i = 0; i < Model.IngredientsList.Count; i++)
+                                {
+                                    <div class="ingredient-item mb-2">
+                                        <div class="input-group">
+                                            <input name="IngredientsList[@i]" value="@Model.IngredientsList[i]"
+                                                   class="form-control" placeholder="Enter ingredient" />
+                                            <button type="button" class="btn btn-outline-danger" onclick="removeIngredient(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                @if (!Model.IngredientsList.Any())
+                                {
+                                    <div class="ingredient-item mb-2">
+                                        <div class="input-group">
+                                            <input name="IngredientsList[0]" class="form-control" placeholder="Enter ingredient" />
+                                            <button type="button" class="btn btn-outline-danger" onclick="removeIngredient(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <span asp-validation-for="IngredientsList" class="text-danger"></span>
                         </div>
 
-                        <!-- Instructions Section - مع الأزرار الأصلية الأفضل -->
+                        <!-- Instructions Section -->
                         <div class="mb-4">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-clipboard-list"></i> Instructions *
-                            </h5>
-                            <div id="instructionsContainer">
-                                <div class="instruction-item mb-3">
-                                    <div class="input-group">
-                                        <span class="input-group-text">1</span>
-                                        <textarea name="InstructionsList[0]" class="form-control" rows="2"
-                                                  placeholder="Describe this step..."></textarea>
-                                        <button type="button" class="btn btn-outline-danger" onclick="removeInstruction(this)">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-primary">
+                                    <i class="fas fa-clipboard-list"></i> Instructions *
+                                </h5>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addInstruction()">
+                                    <i class="fas fa-plus"></i> Add Step
+                                </button>
                             </div>
-                            <!-- ✅ زر الإضافة الأصلي الأفضل -->
-                            <button type="button" class="btn btn-success mt-2" onclick="addInstruction()">
-                                <i class="fas fa-plus"></i> Add Step
-                            </button>
-                            <span asp-validation-for="InstructionsList" class="text-danger d-block"></span>
+                            <div id="instructionsContainer">
+                                @for (int i = 0; i < Model.InstructionsList.Count; i++)
+                                {
+                                    <div class="instruction-item mb-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text">@(i + 1)</span>
+                                            <textarea name="InstructionsList[@i]" class="form-control" rows="2"
+                                                      placeholder="Describe this step...">@Model.InstructionsList[i]</textarea>
+                                            <button type="button" class="btn btn-outline-danger" onclick="removeInstruction(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                @if (!Model.InstructionsList.Any())
+                                {
+                                    <div class="instruction-item mb-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text">1</span>
+                                            <textarea name="InstructionsList[0]" class="form-control" rows="2"
+                                                      placeholder="Describe this step..."></textarea>
+                                            <button type="button" class="btn btn-outline-danger" onclick="removeInstruction(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <span asp-validation-for="InstructionsList" class="text-danger"></span>
                         </div>
 
                         <!-- Action Buttons -->
@@ -119,8 +153,8 @@
                             <a asp-action="MyRecipes" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Cancel
                             </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save"></i> Save Recipe
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Update Recipe
                             </button>
                         </div>
                     </form>
@@ -131,8 +165,8 @@
 </div>
 
 <script>
-    let ingredientIndex = 1;
-    let instructionIndex = 1;
+    let ingredientIndex = @Model.IngredientsList.Count;
+    let instructionIndex = @Model.InstructionsList.Count;
 
     function addIngredient() {
         const container = document.getElementById('ingredientsContainer');
@@ -142,7 +176,7 @@
             <div class="input-group">
                 <input name="IngredientsList[${ingredientIndex}]" class="form-control" placeholder="Enter ingredient" />
                 <button type="button" class="btn btn-outline-danger" onclick="removeIngredient(this)">
-                    <i class="fas fa-minus"></i>
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         `;
@@ -176,7 +210,7 @@
                 <textarea name="InstructionsList[${instructionIndex}]" class="form-control" rows="2"
                           placeholder="Describe this step..."></textarea>
                 <button type="button" class="btn btn-outline-danger" onclick="removeInstruction(this)">
-                    <i class="fas fa-minus"></i>
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         `;

@@ -18,21 +18,27 @@ namespace RecipePlatform.MVC.Controllers
         private readonly IRecipeService _recipeService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RecipeController> _logger;
+        private readonly IRatingService _ratingService;
 
         public RecipeController(
             IGenericRepository<Recipe> recipeRepo,
             UserManager<ApplicationUser> userManager,
             IRecipeService recipeService,
             IGenericRepository<Category> catRepo,
-            ILogger<RecipeController> logger)
+            ILogger<RecipeController> logger,
+            IRatingService ratingService)
         {
             _recipeRepo = recipeRepo;
             _userManager = userManager;
             _recipeService = recipeService;
             _catRepo = catRepo;
             _logger = logger;
+            _ratingService = ratingService;
         }
 
+        // EXISTING METHODS (unchanged)
+
+        [Authorize]
         public async Task<IActionResult> MyRecipes()
         {
             try
@@ -41,12 +47,25 @@ namespace RecipePlatform.MVC.Controllers
                 var userId = _userManager.GetUserId(User);
                 _logger.LogInformation($"User ID: {userId ?? "NULL"}");
 
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
                 var recipes = await _recipeService.GetRecipesByUserId(userId);
                 _logger.LogInformation($"Found {recipes?.Count ?? 0} recipes");
 
+                var user = await _userManager.GetUserAsync(User);
+
+                
+                var displayName = string.IsNullOrEmpty(user?.UserName)
+                    ? user?.Email?.Split('@')[0] ?? "User"
+                    : user.UserName;
+
                 var viewModel = new MyRecipesVM
                 {
-                    Recipes = recipes ?? new List<Recipe>()
+                    Recipes = recipes ?? new List<Recipe>(),
+                    UserName = displayName
                 };
 
                 return View(viewModel);
@@ -54,7 +73,7 @@ namespace RecipePlatform.MVC.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "❌ Error in MyRecipes");
-                return View(new MyRecipesVM { Recipes = new List<Recipe>() });
+                return View(new MyRecipesVM { Recipes = new List<Recipe>(), UserName = "User" });
             }
         }
 
@@ -66,6 +85,7 @@ namespace RecipePlatform.MVC.Controllers
 
         // GET: Recipe/Add
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Add()
         {
             try
@@ -74,7 +94,6 @@ namespace RecipePlatform.MVC.Controllers
 
                 var viewModel = new AddRecipeVM();
 
-                // تحضير قائمة التصنيفات
                 var categories = await _catRepo.GetAllAsync();
                 _logger.LogInformation($"Categories loaded: {categories?.Count() ?? 0}");
 
@@ -84,7 +103,6 @@ namespace RecipePlatform.MVC.Controllers
                     Text = c.Name
                 }) ?? new List<SelectListItem>();
 
-                // تحضير قائمة مستويات الصعوبة
                 viewModel.Difficulties = Enum.GetValues(typeof(DifficultyLevel))
                     .Cast<DifficultyLevel>()
                     .Select(d => new SelectListItem
@@ -106,76 +124,26 @@ namespace RecipePlatform.MVC.Controllers
 
         // POST: Recipe/Add
         [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(AddRecipeVM viewModel)
         {
             try
             {
                 _logger.LogInformation("🚀 POST Add method called");
-                _logger.LogInformation($"Model received - Recipe Title: {viewModel?.Recipe?.Title ?? "NULL"}");
-                _logger.LogInformation($"Model State Valid: {ModelState.IsValid}");
 
-                // تسجيل تفاصيل الموديل
-                if (viewModel?.Recipe != null)
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
                 {
-                    _logger.LogInformation($"Recipe Details:");
-                    _logger.LogInformation($"  - Title: {viewModel.Recipe.Title}");
-                    _logger.LogInformation($"  - Description: {viewModel.Recipe.Description}");
-                    _logger.LogInformation($"  - CategoryId: {viewModel.Recipe.CategoryId}");
-                    _logger.LogInformation($"  - Difficulty: {viewModel.Recipe.Difficulty}");
-                    _logger.LogInformation($"  - PrepTime: {viewModel.Recipe.PrepTimeMinutes}");
-                    _logger.LogInformation($"  - CookTime: {viewModel.Recipe.CookTimeMinutes}");
+                    return RedirectToAction("Login", "Account");
                 }
 
-                // تسجيل المكونات والخطوات
-                _logger.LogInformation($"Ingredients received: {viewModel?.IngredientsList?.Count ?? 0}");
-                if (viewModel?.IngredientsList != null)
-                {
-                    for (int i = 0; i < viewModel.IngredientsList.Count; i++)
-                    {
-                        _logger.LogInformation($"  Ingredient {i + 1}: '{viewModel.IngredientsList[i]}'");
-                    }
-                }
+                // Remove unnecessary model state entries
+                ModelState.Remove("Recipe.Category");
+                ModelState.Remove("Recipe.Author");
+                ModelState.Remove("Recipe.Ratings");
 
-                _logger.LogInformation($"Instructions received: {viewModel?.InstructionsList?.Count ?? 0}");
-                if (viewModel?.InstructionsList != null)
-                {
-                    for (int i = 0; i < viewModel.InstructionsList.Count; i++)
-                    {
-                        _logger.LogInformation($"  Instruction {i + 1}: '{viewModel.InstructionsList[i]}'");
-                    }
-                }
-
-                // تسجيل أخطاء الموديل
-                if (!ModelState.IsValid)
-                {
-                    _logger.LogWarning("❌ ModelState is not valid!");
-                    foreach (var error in ModelState)
-                    {
-                        if (error.Value.Errors.Any())
-                        {
-                            _logger.LogWarning($"Field '{error.Key}' has errors:");
-                            foreach (var errorMsg in error.Value.Errors)
-                            {
-                                _logger.LogWarning($"  - {errorMsg.ErrorMessage}");
-                            }
-                        }
-                    }
-                }
-
-                // التحقق من البيانات المطلوبة
-                if (viewModel == null)
-                {
-                    _logger.LogError("❌ ViewModel is null");
-                    return BadRequest("ViewModel is null");
-                }
-
-                if (viewModel.Recipe == null)
-                {
-                    _logger.LogError("❌ Recipe is null");
-                    viewModel.Recipe = new Recipe();
-                }
-
-                // إزالة المكونات والخطوات الفارغة
+                // Clean up ingredients and instructions
                 viewModel.IngredientsList = viewModel.IngredientsList?
                     .Where(x => !string.IsNullOrWhiteSpace(x))
                     .ToList() ?? new List<string>();
@@ -184,96 +152,63 @@ namespace RecipePlatform.MVC.Controllers
                     .Where(x => !string.IsNullOrWhiteSpace(x))
                     .ToList() ?? new List<string>();
 
-                _logger.LogInformation($"After cleanup - Ingredients: {viewModel.IngredientsList.Count}, Instructions: {viewModel.InstructionsList.Count}");
-
-                // التحقق من وجود مكونات وخطوات
+                // Validate ingredients and instructions
                 if (!viewModel.IngredientsList.Any())
                 {
-                    ModelState.AddModelError("IngredientsList", "يجب إضافة مكون واحد على الأقل");
-                    _logger.LogWarning("❌ No ingredients provided");
+                    ModelState.AddModelError("IngredientsList", "At least one ingredient is required");
                 }
 
                 if (!viewModel.InstructionsList.Any())
                 {
-                    ModelState.AddModelError("InstructionsList", "يجب إضافة خطوة واحدة على الأقل");
-                    _logger.LogWarning("❌ No instructions provided");
+                    ModelState.AddModelError("InstructionsList", "At least one instruction is required");
                 }
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("❌ Returning to view due to validation errors");
                     await ReloadDropdownData(viewModel);
                     return View(viewModel);
                 }
 
-                // إعداد بيانات الوصفة
-                _logger.LogInformation("✅ Validation passed, preparing recipe data");
-
-                var userId = _userManager.GetUserId(User);
-                _logger.LogInformation($"Current User ID: {userId ?? "NULL"}");
-
-                viewModel.Recipe.AuthorId = userId ?? "default-user"; // للاختبار
+                // Prepare recipe data
+                viewModel.Recipe.AuthorId = userId;
                 viewModel.Recipe.CreatedDate = DateTime.Now;
 
-                // إنشاء المكونات
+                // Create ingredients
                 var ingredients = new List<RecipeIngredient>();
                 for (int i = 0; i < viewModel.IngredientsList.Count; i++)
                 {
-                    var ingredient = new RecipeIngredient
+                    ingredients.Add(new RecipeIngredient
                     {
                         Name = viewModel.IngredientsList[i].Trim(),
                         Order = i + 1
-                    };
-                    ingredients.Add(ingredient);
-                    _logger.LogInformation($"Created ingredient {i + 1}: '{ingredient.Name}'");
+                    });
                 }
 
-                // إنشاء الخطوات
+                // Create instructions
                 var instructions = new List<RecipeInstruction>();
                 for (int i = 0; i < viewModel.InstructionsList.Count; i++)
                 {
-                    var instruction = new RecipeInstruction
+                    instructions.Add(new RecipeInstruction
                     {
                         Description = viewModel.InstructionsList[i].Trim(),
                         StepNumber = i + 1
-                    };
-                    instructions.Add(instruction);
-                    _logger.LogInformation($"Created instruction {i + 1}: '{instruction.Description}'");
+                    });
                 }
 
-                // ربط البيانات
                 viewModel.Recipe.Ingredients = ingredients;
                 viewModel.Recipe.Instructions = instructions;
 
-                _logger.LogInformation("📝 Final recipe data:");
-                _logger.LogInformation($"  - Title: {viewModel.Recipe.Title}");
-                _logger.LogInformation($"  - CategoryId: {viewModel.Recipe.CategoryId}");
-                _logger.LogInformation($"  - AuthorId: {viewModel.Recipe.AuthorId}");
-                _logger.LogInformation($"  - Ingredients Count: {ingredients.Count}");
-                _logger.LogInformation($"  - Instructions Count: {instructions.Count}");
-
-                // الحفظ في قاعدة البيانات
-                _logger.LogInformation("💾 Attempting to save to database...");
                 await _recipeRepo.AddAsync(viewModel.Recipe);
 
                 _logger.LogInformation("✅ Recipe saved successfully!");
-                TempData["SuccessMessage"] = "تمت إضافة الوصفة بنجاح! 🎉";
+                TempData["SuccessMessage"] = "Recipe added successfully! 🎉";
 
                 return RedirectToAction("MyRecipes");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "❌ Error in POST Add method");
-                _logger.LogError($"Exception Type: {ex.GetType().Name}");
-                _logger.LogError($"Exception Message: {ex.Message}");
-                _logger.LogError($"Stack Trace: {ex.StackTrace}");
-
-                if (ex.InnerException != null)
-                {
-                    _logger.LogError($"Inner Exception: {ex.InnerException.Message}");
-                }
-
-                ModelState.AddModelError("", $"حدث خطأ أثناء حفظ الوصفة: {ex.Message}");
+                ModelState.AddModelError("", $"An error occurred while saving the recipe: {ex.Message}");
 
                 if (viewModel != null)
                 {
@@ -284,6 +219,265 @@ namespace RecipePlatform.MVC.Controllers
                 return Content($"Critical Error: {ex.Message}");
             }
         }
+
+        // NEW: GET Edit Recipe
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditRecipe(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"✏️ GET EditRecipe called for recipe {id}");
+
+                var recipe = await _recipeService.GetRecipeWithRatingsAsync(id);
+                if (recipe == null)
+                {
+                    _logger.LogWarning($"❌ Recipe {id} not found");
+                    return NotFound();
+                }
+
+                var userId = _userManager.GetUserId(User);
+                if (recipe.AuthorId != userId)
+                {
+                    _logger.LogWarning($"❌ User {userId} trying to edit recipe {id} not owned by them");
+                    TempData["ErrorMessage"] = "You can only edit your own recipes.";
+                    return RedirectToAction("MyRecipes");
+                }
+
+                var categories = await _catRepo.GetAllAsync();
+
+                var viewModel = new EditRecipeVM
+                {
+                    Recipe = recipe,
+                    IngredientsList = recipe.Ingredients?.OrderBy(i => i.Order).Select(i => i.Name).ToList() ?? new List<string>(),
+                    InstructionsList = recipe.Instructions?.OrderBy(i => i.StepNumber).Select(i => i.Description).ToList() ?? new List<string>(),
+                    Categories = categories?.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name,
+                        Selected = c.Id == recipe.CategoryId
+                    }) ?? new List<SelectListItem>(),
+                    Difficulties = Enum.GetValues(typeof(DifficultyLevel))
+                        .Cast<DifficultyLevel>()
+                        .Select(d => new SelectListItem
+                        {
+                            Value = d.ToString(),
+                            Text = GetDifficultyDisplayName(d),
+                            Selected = d == recipe.Difficulty
+                        })
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ Error in GET EditRecipe for recipe {id}");
+                return Content($"Error loading recipe for editing: {ex.Message}");
+            }
+        }
+
+        // NEW: POST Edit Recipe
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditRecipe(EditRecipeVM viewModel)
+        {
+            try
+            {
+                _logger.LogInformation($"🚀 POST EditRecipe called for recipe {viewModel.Recipe?.Id}");
+
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var existingRecipe = await _recipeService.GetRecipeWithRatingsAsync(viewModel.Recipe.Id);
+                if (existingRecipe == null)
+                {
+                    return NotFound();
+                }
+
+                if (existingRecipe.AuthorId != userId)
+                {
+                    TempData["ErrorMessage"] = "You can only edit your own recipes.";
+                    return RedirectToAction("MyRecipes");
+                }
+
+                // Remove unnecessary model state entries
+                ModelState.Remove("Recipe.Category");
+                ModelState.Remove("Recipe.Author");
+                ModelState.Remove("Recipe.Ratings");
+
+                // Clean up ingredients and instructions
+                viewModel.IngredientsList = viewModel.IngredientsList?
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList() ?? new List<string>();
+
+                viewModel.InstructionsList = viewModel.InstructionsList?
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList() ?? new List<string>();
+
+                // Validate ingredients and instructions
+                if (!viewModel.IngredientsList.Any())
+                {
+                    ModelState.AddModelError("IngredientsList", "At least one ingredient is required");
+                }
+
+                if (!viewModel.InstructionsList.Any())
+                {
+                    ModelState.AddModelError("InstructionsList", "At least one instruction is required");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    await ReloadEditDropdownData(viewModel);
+                    return View(viewModel);
+                }
+
+                // Update recipe properties
+                existingRecipe.Title = viewModel.Recipe.Title;
+                existingRecipe.Description = viewModel.Recipe.Description;
+                existingRecipe.CategoryId = viewModel.Recipe.CategoryId;
+                existingRecipe.Difficulty = viewModel.Recipe.Difficulty;
+                existingRecipe.PrepTimeMinutes = viewModel.Recipe.PrepTimeMinutes;
+                existingRecipe.CookTimeMinutes = viewModel.Recipe.CookTimeMinutes;
+                existingRecipe.Servings = viewModel.Recipe.Servings;
+
+                // Update ingredients (remove old, add new)
+                existingRecipe.Ingredients.Clear();
+                for (int i = 0; i < viewModel.IngredientsList.Count; i++)
+                {
+                    existingRecipe.Ingredients.Add(new RecipeIngredient
+                    {
+                        Name = viewModel.IngredientsList[i].Trim(),
+                        Order = i + 1,
+                        RecipeId = existingRecipe.Id
+                    });
+                }
+
+                // Update instructions (remove old, add new)
+                existingRecipe.Instructions.Clear();
+                for (int i = 0; i < viewModel.InstructionsList.Count; i++)
+                {
+                    existingRecipe.Instructions.Add(new RecipeInstruction
+                    {
+                        Description = viewModel.InstructionsList[i].Trim(),
+                        StepNumber = i + 1,
+                        RecipeId = existingRecipe.Id
+                    });
+                }
+
+                await _recipeRepo.UpdateAsync(existingRecipe);
+
+                _logger.LogInformation($"✅ Recipe {existingRecipe.Id} updated successfully!");
+                TempData["SuccessMessage"] = "Recipe updated successfully! ✏️";
+
+                return RedirectToAction("MyRecipes");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ Error in POST EditRecipe for recipe {viewModel.Recipe?.Id}");
+                ModelState.AddModelError("", $"An error occurred while updating the recipe: {ex.Message}");
+
+                await ReloadEditDropdownData(viewModel);
+                return View(viewModel);
+            }
+        }
+
+        // NEW: DELETE Recipe
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteRecipe(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"🗑️ DeleteRecipe called for recipe {id}");
+
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var recipe = await _recipeService.GetByIdAsync(id);
+                if (recipe == null)
+                {
+                    _logger.LogWarning($"❌ Recipe {id} not found");
+                    TempData["ErrorMessage"] = "Recipe not found.";
+                    return RedirectToAction("MyRecipes");
+                }
+
+                if (recipe.AuthorId != userId)
+                {
+                    _logger.LogWarning($"❌ User {userId} trying to delete recipe {id} not owned by them");
+                    TempData["ErrorMessage"] = "You can only delete your own recipes.";
+                    return RedirectToAction("MyRecipes");
+                }
+
+                await _recipeRepo.DeleteAsync(recipe);
+
+                _logger.LogInformation($"✅ Recipe {id} deleted successfully!");
+                TempData["SuccessMessage"] = "Recipe deleted successfully! 🗑️";
+
+                return RedirectToAction("MyRecipes");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ Error deleting recipe {id}");
+                TempData["ErrorMessage"] = $"An error occurred while deleting the recipe: {ex.Message}";
+                return RedirectToAction("MyRecipes");
+            }
+        }
+
+        // EXISTING Details method (unchanged)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"📖 Details method called for recipe {id}");
+
+                var recipe = await _recipeService.GetRecipeWithRatingsAsync(id);
+                if (recipe == null)
+                {
+                    _logger.LogWarning($"❌ Recipe {id} not found");
+                    return NotFound();
+                }
+
+                var userId = _userManager.GetUserId(User);
+                _logger.LogInformation($"Current User ID: {userId ?? "NULL"}");
+
+                var viewModel = new RecipeRatingViewModel
+                {
+                    Recipe = recipe,
+                    AverageRating = await _recipeService.GetAverageRating(id),
+                    TotalRatings = await _recipeService.GetTotalRatingsCount(id),
+                    IsUserLoggedIn = !string.IsNullOrEmpty(userId)
+                };
+
+                if (viewModel.IsUserLoggedIn)
+                {
+                    viewModel.HasUserRated = await _recipeService.HasUserRated(id, userId);
+                    if (viewModel.HasUserRated)
+                    {
+                        var userRating = await _recipeService.GetUserRating(id, userId);
+                        viewModel.UserRating = userRating?.RateValue;
+                    }
+                }
+
+                _logger.LogInformation($"✅ Recipe details loaded - Avg Rating: {viewModel.AverageRating}, Total: {viewModel.TotalRatings}");
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ Error loading recipe details for {id}");
+                return Content($"Error loading recipe: {ex.Message}");
+            }
+        }
+
+        // HELPER METHODS
 
         private async Task ReloadDropdownData(AddRecipeVM viewModel)
         {
@@ -316,6 +510,35 @@ namespace RecipePlatform.MVC.Controllers
             }
         }
 
+        private async Task ReloadEditDropdownData(EditRecipeVM viewModel)
+        {
+            try
+            {
+                var categories = await _catRepo.GetAllAsync();
+                viewModel.Categories = categories?.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name,
+                    Selected = c.Id == viewModel.Recipe.CategoryId
+                }) ?? new List<SelectListItem>();
+
+                viewModel.Difficulties = Enum.GetValues(typeof(DifficultyLevel))
+                    .Cast<DifficultyLevel>()
+                    .Select(d => new SelectListItem
+                    {
+                        Value = d.ToString(),
+                        Text = GetDifficultyDisplayName(d),
+                        Selected = d == viewModel.Recipe.Difficulty
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error reloading edit dropdown data");
+                viewModel.Categories = new List<SelectListItem>();
+                viewModel.Difficulties = new List<SelectListItem>();
+            }
+        }
+
         private string GetDifficultyDisplayName(DifficultyLevel difficulty)
         {
             return difficulty switch
@@ -327,7 +550,7 @@ namespace RecipePlatform.MVC.Controllers
             };
         }
 
-        // للاختبار السريع
+        // TEST METHODS (can be removed in production)
         [HttpGet]
         public IActionResult TestGet()
         {

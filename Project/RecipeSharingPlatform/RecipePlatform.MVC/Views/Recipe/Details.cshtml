@@ -1,0 +1,489 @@
+﻿@model RecipePlatform.MVC.Models.ViewModels.RecipeRatingViewModel
+@{
+    ViewData["Title"] = Model.Recipe.Title;
+}
+
+<div class="container my-5">
+    <!-- Recipe Header -->
+    <div class="row">
+        <div class="col-12">
+            <div class="recipe-header bg-white rounded-4 shadow-sm p-4 mb-4">
+                <h1 class="recipe-title mb-3">@Model.Recipe.Title</h1>
+                <div class="recipe-meta d-flex flex-wrap gap-3 mb-3">
+                    <span class="badge badge-rounded badge-difficulty-@Model.Recipe.Difficulty?.ToString().ToLower()">
+                        <i class="fas fa-signal"></i> @Model.Recipe.Difficulty
+                    </span>
+                    <span class="text-muted">
+                        <i class="fas fa-clock"></i> @Model.Recipe.PrepTimeMinutes minutes prep
+                    </span>
+                    <span class="text-muted">
+                        <i class="fas fa-fire"></i> @Model.Recipe.CookTimeMinutes minutes cook
+                    </span>
+                    <span class="text-muted">
+                        <i class="fas fa-users"></i> @Model.Recipe.Servings servings
+                    </span>
+                </div>
+                <div class="author-info">
+                    <i class="fas fa-user-circle"></i>
+                    <a href="@Url.Action("Profile", "User", new { username = Model.Recipe.Author?.UserName })"
+                       class="author-name">@Model.Recipe.Author?.UserName</a>
+                    <span class="text-muted mx-2">•</span>
+                    <span class="text-muted">@Model.Recipe.CreatedDate?.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONLY Rating Display Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="recipe-rating-display bg-white rounded-4 shadow-sm p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center">
+                        <div class="average-score display-4 fw-bold text-warning mb-2" id="averageScore">
+                            @Model.AverageRating.ToString("F1")
+                        </div>
+                        <div class="average-stars mb-2" id="averageStars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                @if (i <= Math.Floor(Model.AverageRating))
+                                {
+                                    <i class="fas fa-star" style="color: #f59e0b !important;"></i>
+                                }
+                                else if (i <= Model.AverageRating)
+                                {
+                                    <i class="fas fa-star-half-alt" style="color: #f59e0b !important;"></i>
+                                }
+                                else
+                                {
+                                    <i class="far fa-star" style="color: #d1d5db !important;"></i>
+                                }
+                            }
+                        </div>
+                        <div class="total-ratings text-muted" id="totalRatings">
+                            Based on @Model.TotalRatings @(Model.TotalRatings == 1 ? "rating" : "ratings")
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h5 class="mb-3">Rating Distribution</h5>
+                        <div class="rating-breakdown">
+                            @for (int stars = 5; stars >= 1; stars--)
+                            {
+                                var ratingCount = Model.Recipe.Ratings?.Count(r => r.RateValue == stars) ?? 0;
+                                var percentage = Model.TotalRatings > 0 ? Math.Round((double)ratingCount / Model.TotalRatings * 100, 1) : 0;
+
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-2" style="min-width: 80px;">
+                                        @stars @(stars == 1 ? "star" : "stars")
+                                    </span>
+                                    <div class="progress flex-grow-1 me-2" style="height: 10px;">
+                                        <div class="progress-bar bg-warning"
+                                             style="width: @(percentage)%"
+                                             role="progressbar"
+                                             aria-valuenow="@percentage"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <span class="text-muted" style="min-width: 50px;">
+                                        @percentage.ToString("F1")%
+                                    </span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Rating Actions Row - SAME LEVEL -->
+                        @if (Model.IsUserLoggedIn)
+                        {
+                            <div class="row mt-4 align-items-center">
+                                <div class="col-md-4 text-center mb-2">
+                                    <span class="badge bg-primary p-2">
+                                        Your Rating: <span id="selectedRating">@(Model.UserRating ?? 0)</span>/5
+                                    </span>
+                                </div>
+                                <div class="col-md-4 text-center mb-2">
+                                    <span class="badge bg-secondary p-2">
+                                        Average: <span id="avgDisplay">@Model.AverageRating.ToString("F1")</span>/5
+                                    </span>
+                                </div>
+                                <div class="col-md-4 text-center mb-2">
+                                    <!-- Rate Recipe Button (Yellow) -->
+                                    <button type="button" class="btn btn-warning btn-sm me-2" id="openRatingModal" data-bs-toggle="modal" data-bs-target="#ratingModal">
+                                        <i class="fas fa-star"></i> Rate Recipe
+                                    </button>
+
+                                    <!-- Remove Rating Button (Red) - Only if user has rated -->
+                                    @if (Model.HasUserRated)
+                                    {
+                                        <button type="button" class="btn btn-danger btn-sm" id="removeRatingBtn">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center mt-4">
+                                <a href="@Url.Action("Login", "Account")" class="btn btn-primary">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Rate
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="recipe-content bg-white rounded-4 shadow-sm p-4">
+                <h3 class="mb-3">Description</h3>
+                <p class="recipe-description">@Model.Recipe.Description</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ingredients and Instructions -->
+    <div class="row">
+        <!-- Ingredients -->
+        <div class="col-lg-6 mb-4">
+            <div class="ingredients-section bg-white rounded-4 shadow-sm p-4 h-100">
+                <h3 class="mb-4">
+                    <i class="fas fa-list-ul text-primary"></i> Ingredients
+                </h3>
+                @if (Model.Recipe.Ingredients?.Any() == true)
+                {
+                    <ul class="list-unstyled">
+                        @foreach (var ingredient in Model.Recipe.Ingredients.OrderBy(i => i.Order))
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                @ingredient.Name
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">No ingredients listed.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="col-lg-6 mb-4">
+            <div class="instructions-section bg-white rounded-4 shadow-sm p-4 h-100">
+                <h3 class="mb-4">
+                    <i class="fas fa-clipboard-list text-primary"></i> Instructions
+                </h3>
+                @if (Model.Recipe.Instructions?.Any() == true)
+                {
+                    <ol class="list-unstyled">
+                        @foreach (var instruction in Model.Recipe.Instructions.OrderBy(i => i.StepNumber))
+                        {
+                            <li class="mb-3 step-item">
+                                <div class="d-flex">
+                                    <span class="badge bg-primary rounded-circle me-3 mt-1" style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center;">
+                                        @instruction.StepNumber
+                                    </span>
+                                    <div class="flex-grow-1">
+                                        @instruction.Description
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                }
+                else
+                {
+                    <p class="text-muted">No instructions provided.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RATING MODAL - Opens when clicking "Rate Recipe" -->
+@if (Model.IsUserLoggedIn)
+{
+    <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="ratingModalLabel">
+                        <i class="fas fa-star"></i> Rate This Recipe
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <h6 class="mb-3" id="modalCurrentRating">
+                        @if (Model.HasUserRated)
+                        {
+                            <span>Your current rating: @Model.UserRating/5 stars</span>
+                        }
+                        else
+                        {
+                            <span>Click on stars to rate this recipe</span>
+                        }
+                    </h6>
+
+                    <!-- Hidden form for CSRF token -->
+                    <form id="ratingForm" style="display: none;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="recipeId" value="@Model.Recipe.Id" />
+                        <input type="hidden" name="rateValue" id="selectedRatingInput" value="@(Model.UserRating ?? 0)" />
+                    </form>
+
+                    <!-- CLEAN Star Rating - NO BACKGROUND SHAPES -->
+                    <div class="modal-stars-container mb-4">
+                        <div class="modal-stars" id="modalRatingStars">
+                            <!-- Stars created by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="rating-feedback-modal" id="modalRatingFeedback">
+                        Click on stars to rate this recipe
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Success/Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- JavaScript for Modal Rating System -->
+<script src="~/js/rating.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🎯 Initializing Modal Rating System');
+
+        const recipeId = @Model.Recipe.Id;
+        let userRating = @(Model.UserRating ?? 0);
+        let currentSelection = 0;
+
+        const modalStarsContainer = document.getElementById('modalRatingStars');
+        const modalFeedback = document.getElementById('modalRatingFeedback');
+        const modalCurrentRating = document.getElementById('modalCurrentRating');
+        const removeBtn = document.getElementById('removeRatingBtn');
+
+        const feedbackMessages = {
+            0: 'Click on stars to rate this recipe',
+            1: '😞 Poor - You didn\'t like this recipe',
+            2: '😐 Fair - Recipe was okay',
+            3: '🙂 Good - Nice recipe',
+            4: '😊 Very Good - Great recipe',
+            5: '🤩 Excellent - Amazing recipe!'
+        };
+
+        // Create modal stars
+        function createModalStars() {
+            if (!modalStarsContainer) return;
+
+            modalStarsContainer.innerHTML = '';
+
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = 'fas fa-star modal-rating-star';
+                star.setAttribute('data-rating', i);
+                star.setAttribute('tabindex', '0');
+                star.setAttribute('title', `${i} star${i > 1 ? 's' : ''}`);
+
+                // Event listeners
+                star.addEventListener('click', () => handleStarClick(i));
+                star.addEventListener('mouseenter', () => handleStarHover(i));
+                star.addEventListener('mouseleave', () => updateStars(currentSelection));
+                star.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleStarClick(i);
+                    }
+                });
+
+                modalStarsContainer.appendChild(star);
+            }
+
+            // Set initial state
+            updateStars(userRating);
+            currentSelection = userRating;
+        }
+
+        function handleStarHover(rating) {
+            updateStars(rating, true);
+            updateFeedback(rating);
+        }
+
+        function handleStarClick(rating) {
+            currentSelection = rating;
+            updateStars(rating);
+            updateFeedback(rating);
+
+            // Auto-submit
+            setTimeout(() => {
+                submitRating(rating);
+            }, 300);
+        }
+
+        function updateStars(rating, isHover = false) {
+            const stars = modalStarsContainer.querySelectorAll('.modal-rating-star');
+
+            stars.forEach((star, index) => {
+                star.classList.remove('selected');
+
+                if (index < rating) {
+                    if (isHover) {
+                        star.style.color = '#fbbf24';
+                        star.style.transform = 'scale(1.1)';
+                    } else {
+                        star.classList.add('selected');
+                        star.style.color = '#f59e0b';
+                        star.style.transform = 'scale(1)';
+                    }
+                } else {
+                    star.style.color = '#d1d5db';
+                    star.style.transform = 'scale(1)';
+                }
+            });
+        }
+
+        function updateFeedback(rating) {
+            if (modalFeedback) {
+                modalFeedback.textContent = feedbackMessages[rating] || feedbackMessages[0];
+            }
+        }
+
+        async function submitRating(rating) {
+            try {
+                showMessage('Saving your rating...', 'info');
+
+                const formData = new FormData();
+                formData.append('recipeId', recipeId);
+                formData.append('rateValue', rating);
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token) {
+                    formData.append('__RequestVerificationToken', token.value);
+                }
+
+                const response = await fetch('/Rating/AddRating', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (response.ok) {
+                    const wasUpdate = userRating > 0;
+                    userRating = rating;
+
+                    // Update UI elements
+                    document.getElementById('selectedRating').textContent = rating;
+
+                    // Close modal and refresh page
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('ratingModal'));
+                    if (modal) modal.hide();
+
+                    showMessage(`Rating ${wasUpdate ? 'updated' : 'submitted'} successfully! Refreshing...`, 'success');
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                console.error('Error submitting rating:', error);
+                showMessage('Error saving rating. Please try again.', 'error');
+            }
+        }
+
+        async function removeRating() {
+            if (!confirm('Are you sure you want to remove your rating?')) return;
+
+            try {
+                showMessage('Removing your rating...', 'info');
+
+                const formData = new FormData();
+                formData.append('recipeId', recipeId);
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token) {
+                    formData.append('__RequestVerificationToken', token.value);
+                }
+
+                const response = await fetch('/Rating/RemoveRating', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (response.ok) {
+                    showMessage('Rating removed successfully! Refreshing...', 'success');
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                console.error('Error removing rating:', error);
+                showMessage('Error removing rating. Please try again.', 'error');
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            messageEl.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+            messageEl.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(messageEl);
+
+            setTimeout(() => {
+                if (messageEl.parentNode) {
+                    messageEl.remove();
+                }
+            }, 4000);
+        }
+
+        // Initialize modal stars when modal opens
+        document.getElementById('ratingModal')?.addEventListener('show.bs.modal', function() {
+            createModalStars();
+            updateFeedback(currentSelection || 0);
+        });
+
+        // Remove rating button
+        if (removeBtn) {
+            removeBtn.addEventListener('click', removeRating);
+        }
+
+        console.log('✅ Modal Rating System initialized');
+    });
+</script>

@@ -84,8 +84,11 @@
                         </td>
                         <td class="d-flex justify-content-center gap-1">
                             <!-- 🔹 View Button -->
-                            <a class="btn btn-info btn-sm" asp-action="ViewUser" asp-route-id="@u.Id">
-                                <i class="bi bi-person-circle"></i> View
+                            <a asp-controller="User" asp-action="Profile" asp-route-username="@u.UserName">
+                                <a asp-controller="User" asp-action="Profile" asp-route-username="@u.UserName"
+                                   class="btn btn-info btn-sm" target="_blank">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
                             </a>
 
                             <!-- 🔸 Suspend/Activate Button -->
@@ -110,7 +113,6 @@
             </tbody>
         </table>
     </div>
-
     <!--  Recipes Panel -->
     <div class="tab-pane fade" id="recipesPanel" role="tabpanel">
         <table class="table table-bordered text-center align-middle">
@@ -132,8 +134,23 @@
                         <td>@recipe.Category?.Name</td>
                         <td>@recipe.CreatedDate?.ToShortDateString()</td>
                         <td>
-                            <button class="btn btn-info btn-sm me-1">View</button>
-                            <button class="btn btn-danger btn-sm">Delete</button>
+                            <div class="d-flex gap-1 justify-content-center">
+                                <!-- زر View -->
+                                <a asp-controller="Admin" asp-action="ViewRecipe" asp-route-id="@recipe.Id"
+                                   class="btn btn-info btn-sm" target="_blank">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+
+                                <!-- زر Delete -->
+                                <form asp-controller="Admin" asp-action="DeleteRecipe" asp-route-id="@recipe.Id"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Are you sure you want to delete recipe: @recipe.Title?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

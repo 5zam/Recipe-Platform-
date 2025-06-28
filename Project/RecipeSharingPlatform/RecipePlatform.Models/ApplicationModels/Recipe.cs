@@ -26,7 +26,7 @@ namespace RecipePlatform.Models.ApplicationModels
         public ApplicationUser? Author { get; set; }
 
         [ForeignKey("CategoryId")]
-        [Required(ErrorMessage = "Please select a category")]
+        //[Required(ErrorMessage = "Please select a category")]
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 

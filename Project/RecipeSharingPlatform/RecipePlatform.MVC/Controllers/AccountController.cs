@@ -10,7 +10,6 @@ namespace RecipePlatform.MVC.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-
         public AccountController(UserManager<ApplicationUser> userManager,
                                  SignInManager<ApplicationUser> signInManager)
         {
@@ -30,15 +29,20 @@ namespace RecipePlatform.MVC.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            string username = model.Email.Split('@')[0];
+            var existingUser = await _userManager.FindByNameAsync(username);
+            if (existingUser != null)
+            {
+                username = username + Random.Shared.Next(100, 999);
+            }
+
             var user = new ApplicationUser
             {
-                UserName = model.Email,
+                UserName = username,
                 Email = model.Email
             };
 
-
             var result = await _userManager.CreateAsync(user, model.Password);
-
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
@@ -47,7 +51,6 @@ namespace RecipePlatform.MVC.Controllers
 
             foreach (var error in result.Errors)
                 ModelState.AddModelError(string.Empty, error.Description);
-
             return View(model);
         }
 
@@ -66,42 +69,41 @@ namespace RecipePlatform.MVC.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]        
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
             var user = await _userManager.FindByEmailAsync(model.Email);
-
             if (user != null)
             {
-                
+                // Check if user is suspended BEFORE login
+                if (!user.IsActive)
+                {
+                    ModelState.AddModelError(string.Empty, "Your account has been suspended. Please contact support.");
+                    return View(model);
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(
-                    user,                              
-                    model.Password,                     
-                    model.RememberMe,                  
-                    lockoutOnFailure: false);           
+                    user,
+                    model.Password,
+                    model.RememberMe,
+                    lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
-                   
                     if (await _userManager.IsInRoleAsync(user, "Admin"))
                     {
                         return RedirectToAction("Dashboard", "Admin");
                     }
 
-                   
                     return RedirectToAction("Index", "Home");
                 }
             }
 
-            
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return View(model);
         }
-
-
-
     }
 }
